@@ -7,7 +7,7 @@ import os
 from pandas import DataFrame
 import html2text
 
-story_id = '35759449'
+STORY_ID = '35759449'
 filename = 'hacker_news_comments.csv'
 
 def update_csv(file, df):
@@ -29,7 +29,7 @@ page = 0
 while True:
     with open(filename, 'a') as file:
         try:
-            url = f"https://hn.algolia.com/api/v1/search_by_date?tags=comment,story_{story_id}&hitsPerPage={hitsPerPage}&page={page}"
+            url = f"https://hn.algolia.com/api/v1/search_by_date?tags=comment,story_{STORY_ID}&hitsPerPage={hitsPerPage}&page={page}"
             response = requests.get(url)
             data = response.json()
             pages = data["nbPages"]
