@@ -17,6 +17,14 @@ Written for python 3.11 and pipenv.
 
 You'll have a `hacker_news_comments.csv` file created locally.
 
+## Verify csv
+
+You can verify the csv has all the comments by running
+
+`python -c "import csv; print(sum(1 for i in csv.reader(open('hacker_news_comments.csv'))))"`
+
+and make sure the count matches the `nbHits` value from the api.
+
 ## Other resources
 
 1. Inspired by https://github.com/jaredsohn/hacker-news-download-all-comments
