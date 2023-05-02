@@ -7,6 +7,8 @@ a csv of an entire thread along with the About info for the commentor.
 This way we can read through a thread and pick out the commentor's email
 if they have it in their bio. This tool uses the algolia api for hn.
 
+![screenshot](screenshot.png)
+
 ## Running
 
 Written for python 3.11 and pipenv.
@@ -21,13 +23,11 @@ Replace the story id in the variable `STORY_ID` in the source code `get_comments
 
 You'll have a `hacker_news_comments.csv` file created locally.
 
-## Verify csv
+## Future Work
 
-You can verify the csv has all the comments by running
-
-`python -c "import csv; print(sum(1 for i in csv.reader(open('hacker_news_comments.csv'))))"`
-
-and make sure the count matches the `nbHits` value from the api.
+This currently works for my needs, for threads < 500 comments. To work reasonably
+for many more comments or many more threads we would have to add asyncio and dispatch
+concurrent requests.
 
 ## Other resources
 
