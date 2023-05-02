@@ -1,6 +1,6 @@
 # Download Hacker News Comment Bios
 
-This a tool for getting leads from [HackerNews](https://news.ycombinator.com/) threads.
+This is a tool for getting leads from [HackerNews](https://news.ycombinator.com/) threads.
 Often you want to reach
 out to people that have participated in a conversation. With this tool you get
 a csv of an entire thread along with the About info for the commentor.
