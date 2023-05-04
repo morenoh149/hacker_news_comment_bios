@@ -1,5 +1,4 @@
-import requests
-import json
+import httpx
 import datetime
 import time
 import pandas as pd
@@ -32,10 +31,9 @@ if os.path.isfile(filename):
     os.remove(filename)
 
 df = DataFrame()
-hitsPerPage = 100
+hitsPerPage = 50
 requested_keys = ["author", "created_at_i", "objectID", "comment_text"]
 
-page = 0
 
 """
 Build dataframe of comments.
@@ -45,40 +43,42 @@ You can verify the csv has all the comments by running
 
 and make sure the count matches the `nbHits` value from the api.
 """
-while True:
+headers = {"User-Agent": "curl/7.72.0"}
+page = 0
+with httpx.Client(headers=headers, timeout=None) as client:
+    while True:
+        url = f"https://hn.algolia.com/api/v1/search_by_date?tags=comment,story_{STORY_ID}&hitsPerPage={hitsPerPage}&page={page}"
+        response = client.get(url)
+        data = response.json()
+        pages = data["nbPages"]
+        last = data["nbHits"] < hitsPerPage
+        data = DataFrame(data["hits"])[requested_keys]
+        print(url)
+        df = pd.concat([df, data], ignore_index=True)
+        time.sleep(1)
+        page += 1
+        if page >= pages:
+            break
+
+    """
+    Add user bios to dataframe.
+    This could be parallelized with more work.
+    """
+    bio_counter = 0
+
+    def get_bio(row):
+        username = row['author']
+        url = f"https://hn.algolia.com/api/v1/users/{username}"
+        global bio_counter
+        bio_counter += 1
+        if (bio_counter % 10 == 0):
+            print(f'Fetch {bio_counter}. Getting bio for {username}.')
+        response = client.get(url)
+        data = response.json()
+        return data['about']
+
+    # add a column to dataframe
+    df['bio'] = df.apply(get_bio, axis=1)
+
     with open(filename, "a") as file:
-        try:
-            url = f"https://hn.algolia.com/api/v1/search_by_date?tags=comment,story_{STORY_ID}&hitsPerPage={hitsPerPage}&page={page}"
-            response = requests.get(url)
-            data = response.json()
-            pages = data["nbPages"]
-            last = data["nbHits"] < hitsPerPage
-            data = DataFrame(data["hits"])[requested_keys]
-            print(url)
-            df = pd.concat([df, data], ignore_index=True)
-            time.sleep(1)
-            page += 1
-            if page >= pages:
-                break
-
-        except Exception as e:
-            print(e)
-
-"""
-Add user bios to dataframe.
-This could be parallelized with more work.
-"""
-bio_counter = 0
-def user_bio(row):
-    username = row['author']
-    url = f"https://hn.algolia.com/api/v1/users/{username}"
-    global bio_counter
-    bio_counter += 1
-    if (bio_counter % 10 == 0):
-        print(f'Fetch {bio_counter}. Getting bio for {username}.')
-    response = requests.get(url)
-    data = response.json()
-    return data['about']
-df['bio'] = df.apply(user_bio, axis=1)
-with open(filename, "a") as file:
-    update_csv(file, df)
+        update_csv(file, df)
