@@ -1,10 +1,13 @@
-import httpx
 import datetime
 import time
-import pandas as pd
 import os
-from pandas import DataFrame
+
+import httpx
 import html2text
+from pandas import DataFrame
+import pandas as pd
+
+t0 = time.time()
 
 STORY_ID = "35759449"
 # STORY_ID = "35769529"
@@ -82,3 +85,8 @@ with httpx.Client(headers=headers, timeout=None) as client:
 
     with open(filename, "a") as file:
         update_csv(file, df)
+
+t1 = time.time()
+
+total = t1-t0
+print(f"Total time: {total} seconds")
