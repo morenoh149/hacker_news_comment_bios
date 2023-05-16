@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import time
 import os
@@ -11,8 +12,14 @@ t0 = time.time()
 
 STORY_ID = "35759449"
 # STORY_ID = "35769529"
+BASE_URL = "https://hn.algolia.com/api/v1/users"
 filename = "hacker_news_comments.csv"
 
+
+async def get_bio(username: str, client: httpx.AsyncClient) -> str:
+    response = await client.get(f"{BASE_URL}/{username}")
+    data = response.json()
+    return data["about"]
 
 def update_csv(file, df):
     df["comment_text"] = df["comment_text"].map(
@@ -34,7 +41,7 @@ if os.path.isfile(filename):
     os.remove(filename)
 
 df = DataFrame()
-hitsPerPage = 50
+pageSize = 100
 requested_keys = ["author", "created_at_i", "objectID", "comment_text"]
 
 
@@ -50,43 +57,34 @@ headers = {"User-Agent": "curl/7.72.0"}
 page = 0
 with httpx.Client(headers=headers, timeout=None) as client:
     while True:
-        url = f"https://hn.algolia.com/api/v1/search_by_date?tags=comment,story_{STORY_ID}&hitsPerPage={hitsPerPage}&page={page}"
+        url = f"https://hn.algolia.com/api/v1/search_by_date?tags=comment,story_{STORY_ID}&hitsPerPage={pageSize}&page={page}"
         response = client.get(url)
         data = response.json()
         pages = data["nbPages"]
-        last = data["nbHits"] < hitsPerPage
+        last = data["nbHits"] < pageSize
         data = DataFrame(data["hits"])[requested_keys]
-        print(url)
+        print(f"Fetching page {url}")
         df = pd.concat([df, data], ignore_index=True)
         time.sleep(1)
         page += 1
         if page >= pages:
             break
 
-    """
-    Add user bios to dataframe.
-    This could be parallelized with more work.
-    """
-    bio_counter = 0
 
-    def get_bio(row):
-        username = row['author']
-        url = f"https://hn.algolia.com/api/v1/users/{username}"
-        global bio_counter
-        bio_counter += 1
-        if (bio_counter % 10 == 0):
-            print(f'Fetch {bio_counter}. Getting bio for {username}.')
-        response = client.get(url)
-        data = response.json()
-        return data['about']
+async def main() -> None:
+    t0 = time.time()
+    usernames = df['author']
 
-    # add a column to dataframe
-    df['bio'] = df.apply(get_bio, axis=1)
+    print(f'Fetching {len(usernames)} bios')
+    headers = {"User-Agent": "curl/7.72.0"}
+    async with httpx.AsyncClient(headers=headers, timeout=None) as client:
+        tasks = [get_bio(user, client) for user in usernames]
+        bios = await asyncio.gather(*tasks)
+
+    df['bio'] = bios
 
     with open(filename, "a") as file:
         update_csv(file, df)
+    print(f"Total time: {time.time() - t0:.3} seconds")
 
-t1 = time.time()
-
-total = t1-t0
-print(f"Total time: {total} seconds")
+asyncio.run(main())

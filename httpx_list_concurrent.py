@@ -1,3 +1,7 @@
+"""
+proof of concept, get all bios in parallel using asyncio
+"""
+
 import asyncio
 import time
 
@@ -58,9 +62,9 @@ async def main() -> None:
     ]
     headers = {"User-Agent": "curl/7.72.0"}
     async with httpx.AsyncClient(headers=headers, timeout=None) as client:
-        bios = await asyncio.gather(*(get_bio(user, client) for user in usernames))
+        tasks = [get_bio(user, client) for user in usernames]
+        bios = await asyncio.gather(*tasks)
     print(dict(zip(usernames, bios)))
     print(f"Total time: {time.time() - t0:.3} seconds")
-    # > Total time: 4.8 seconds
 
 asyncio.run(main())
