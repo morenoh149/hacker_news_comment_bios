@@ -41,6 +41,11 @@ def parse_args():
 
 
 """
+This script first finds all comments in a thread by paginating through the api one page at a time.
+Then it fetches the bio for each user in parallel using httpx.AsyncClient.
+Finally it writes the results from the pandas dataframe into a csv file.
+
+
 You can verify the csv has all the comments by running
 
 `python -c "import csv; print(sum(1 for i in csv.reader(open('hackernews_comments.csv'))))"`
