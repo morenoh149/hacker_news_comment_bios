@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import datetime
 import time
@@ -8,7 +9,7 @@ import html2text
 import pandas as pd
 
 
-STORY_ID = "35759449"
+# STORY_ID = "35759449"
 # STORY_ID = "35769529"
 BASE_URL = "https://hn.algolia.com/api/v1"
 
@@ -33,18 +34,26 @@ def update_csv(file, df):
     ordered_df = df[["author", "created_at", "objectID", "comment_text", "bio"]]
     ordered_df.to_csv(file, encoding="utf-8", index=False)
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Download bios from hackernews.')
+    parser.add_argument('story_id', help='The thread id to download comments from.')
+    return parser.parse_args()
+
 
 """
 You can verify the csv has all the comments by running
 
-`python -c "import csv; print(sum(1 for i in csv.reader(open('hacker_news_comments.csv'))))"`
+`python -c "import csv; print(sum(1 for i in csv.reader(open('hackernews_comments.csv'))))"`
 
 and make sure the count matches the `nbHits` value from the api.
 """
 async def main() -> None:
     t0 = time.time()
 
-    filename = "hacker_news_comments.csv"
+    args = parse_args()
+    STORY_ID = args.story_id
+
+    filename = "hackernews_comments.csv"
     if os.path.isfile(filename):
         os.remove(filename)
 
@@ -63,7 +72,6 @@ async def main() -> None:
             data = pd.DataFrame(data["hits"])[requested_keys]
             print(f"Fetching page {url}")
             df = pd.concat([df, data], ignore_index=True)
-            time.sleep(1)
             page += 1
             if page >= pages:
                 break
