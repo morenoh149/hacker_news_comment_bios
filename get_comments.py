@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
+
+"""
+Usage:
+$ ./get_comments.py 35769529
+
+This script first finds all comments in a hackernews thread by paginating through the api one page at a time.
+Then it fetches the bio for each user in parallel using httpx.AsyncClient.
+The comments and bios are accumulated into a pandas dataframe.
+Finally it writes the pandas dataframe to a csv file.
+
+This project is licensed under the terms of the MIT license.
+"""
+
 import argparse
 import asyncio
+import csv
 import datetime
 import io
 import time
@@ -17,6 +31,9 @@ BASE_URL: str = "https://hn.algolia.com/api/v1"
 
 
 async def get_bio(username: str, client: httpx.AsyncClient) -> str:
+    """
+    get_bio async wrapper allowing bios to be fetched in parallel.
+    """
     response = await client.get(f"{BASE_URL}/users/{username}")
     data: dict = response.json()
     return data["about"]
@@ -65,22 +82,15 @@ def update_csv(file: io.TextIOWrapper, df: pd.DataFrame) -> None:
     ordered_df.to_csv(file, encoding="utf-8", index=False)
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description='Download bios from hackernews.')
+    """
+    parse_args parses the command line argument, story_id
+    """
+    parser = argparse.ArgumentParser(
+        prog="Download HackerNews comments",
+        description='Download bios from hackernews and stores them in a csv')
     parser.add_argument('story_id', help='The thread id to download comments from.')
     return parser.parse_args()
 
-
-"""
-This script first finds all comments in a thread by paginating through the api one page at a time.
-Then it fetches the bio for each user in parallel using httpx.AsyncClient.
-Finally it writes the results from the pandas dataframe into a csv file.
-
-
-You can verify the csv has all the comments by running
-
-
-and make sure the count matches the `nbHits` value from the api.
-"""
 async def main() -> None:
     t0 = time.time()
 
@@ -104,9 +114,10 @@ async def main() -> None:
     with open(filename, "a") as file:
         update_csv(file, df)
 
-    """
-    verify csv like `python -c "import csv; print(sum(1 for i in csv.reader(open('hackernews_comments.csv'))))"`
-    """
+    # verify csv file is the same length as the dataframe plus the header
+    csv_num_lines = sum(1 for i in csv.reader(open('hackernews_comments.csv')))
+    if csv_num_lines != (len(df) + 1):
+        raise Exception("csv file is not the same length as the dataframe", len(df), csv_num_lines)
 
     print(f"Total time: {time.time() - t0:.3} seconds")
 
@@ -114,19 +125,10 @@ asyncio.run(main())
 
 """
 TODO
-* add type annotations to update_csv;
-* move the search_by_date thing into a separate function;
-[ ] make it async;
-[ ] automate the verification on line 51
-
-Clean up the comments to be more specific "in a thread", what thread? One site supported?
-And move the comments to the top.
-And toss a license on it.
-It looks fine to me as a portfolio piece, you just want to assume that anyone looking at it for portfolio purposes
-has limited time and wants to see at a quick glance what it does, so be very clear at the top of the file what it does.
-Tossing a license also says "this I have made as a contribution", which is good.
-
-[ ] converting the "this is documentation" comment into a docstring that you can access with myscript --help is a nice touch too
-
+[*] add type annotations to update_csv;
+[*] move the search_by_date thing into a separate function;
+[ ] make it get_comments async;
+[*] automate the verification of the csv
+[*] converting the "this is documentation" comment into a docstring that you can access with myscript --help is a nice touch too
 [ ] finish out typing and put it in a repo with a CI pipeline checking the typing and running linters (say flake8) on it
 """
