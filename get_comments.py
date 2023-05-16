@@ -8,12 +8,10 @@ import html2text
 from pandas import DataFrame
 import pandas as pd
 
-t0 = time.time()
 
 STORY_ID = "35759449"
 # STORY_ID = "35769529"
 BASE_URL = "https://hn.algolia.com/api/v1"
-filename = "hacker_news_comments.csv"
 
 
 async def get_bio(username: str, client: httpx.AsyncClient) -> str:
@@ -37,41 +35,39 @@ def update_csv(file, df):
     ordered_df.to_csv(file, encoding="utf-8", index=False)
 
 
-if os.path.isfile(filename):
-    os.remove(filename)
-
-df = DataFrame()
-pageSize = 100
-requested_keys = ["author", "created_at_i", "objectID", "comment_text"]
-
-
 """
-Build dataframe of comments.
 You can verify the csv has all the comments by running
 
 `python -c "import csv; print(sum(1 for i in csv.reader(open('hacker_news_comments.csv'))))"`
 
 and make sure the count matches the `nbHits` value from the api.
 """
-headers = {"User-Agent": "curl/7.72.0"}
-page = 0
-with httpx.Client(headers=headers, timeout=None) as client:
-    while True:
-        url = f"{BASE_URL}/search_by_date?tags=comment,story_{STORY_ID}&hitsPerPage={pageSize}&page={page}"
-        response = client.get(url)
-        data = response.json()
-        pages = data["nbPages"]
-        last = data["nbHits"] < pageSize
-        data = DataFrame(data["hits"])[requested_keys]
-        print(f"Fetching page {url}")
-        df = pd.concat([df, data], ignore_index=True)
-        time.sleep(1)
-        page += 1
-        if page >= pages:
-            break
-
-
 async def main() -> None:
+    t0 = time.time()
+
+    filename = "hacker_news_comments.csv"
+    if os.path.isfile(filename):
+        os.remove(filename)
+
+    df = DataFrame()
+    pageSize = 100
+    requested_keys = ["author", "created_at_i", "objectID", "comment_text"]
+    headers = {"User-Agent": "curl/7.72.0"}
+    page = 0
+    with httpx.Client(headers=headers, timeout=None) as client:
+        while True:
+            url = f"{BASE_URL}/search_by_date?tags=comment,story_{STORY_ID}&hitsPerPage={pageSize}&page={page}"
+            response = client.get(url)
+            data = response.json()
+            pages = data["nbPages"]
+            last = data["nbHits"] < pageSize
+            data = DataFrame(data["hits"])[requested_keys]
+            print(f"Fetching page {url}")
+            df = pd.concat([df, data], ignore_index=True)
+            time.sleep(1)
+            page += 1
+            if page >= pages:
+                break
     usernames = df['author']
 
     print(f'Fetching {len(usernames)} bios')
