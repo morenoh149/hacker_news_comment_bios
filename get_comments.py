@@ -3,13 +3,12 @@ import datetime
 import time
 import os
 
+import click
 import httpx
 import html2text
 import pandas as pd
 
 
-STORY_ID = "35759449"
-# STORY_ID = "35769529"
 BASE_URL = "https://hn.algolia.com/api/v1"
 
 
@@ -42,7 +41,16 @@ You can verify the csv has all the comments by running
 and make sure the count matches the `nbHits` value from the api.
 """
 async def main() -> None:
+
+    @click.command()
+    @click.option('--story_id', help='The HackerNews thread id.')
+    def get_args(story_id):
+        STORY_ID = story_id
+    get_args()
     t0 = time.time()
+
+    # STORY_ID = "35759449"
+    # STORY_ID = "35769529"
 
     filename = "hacker_news_comments.csv"
     if os.path.isfile(filename):

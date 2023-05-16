@@ -7,6 +7,7 @@ name = "pypi"
 pandas = "*"
 html2text = "*"
 httpx = "*"
+click = "*"
 
 [dev-packages]
 
