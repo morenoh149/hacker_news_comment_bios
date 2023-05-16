@@ -5,7 +5,6 @@ import os
 
 import httpx
 import html2text
-from pandas import DataFrame
 import pandas as pd
 
 
@@ -49,7 +48,7 @@ async def main() -> None:
     if os.path.isfile(filename):
         os.remove(filename)
 
-    df = DataFrame()
+    df = pd.DataFrame()
     pageSize = 100
     requested_keys = ["author", "created_at_i", "objectID", "comment_text"]
     headers = {"User-Agent": "curl/7.72.0"}
@@ -61,7 +60,7 @@ async def main() -> None:
             data = response.json()
             pages = data["nbPages"]
             last = data["nbHits"] < pageSize
-            data = DataFrame(data["hits"])[requested_keys]
+            data = pd.DataFrame(data["hits"])[requested_keys]
             print(f"Fetching page {url}")
             df = pd.concat([df, data], ignore_index=True)
             time.sleep(1)
