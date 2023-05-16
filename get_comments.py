@@ -12,12 +12,12 @@ t0 = time.time()
 
 STORY_ID = "35759449"
 # STORY_ID = "35769529"
-BASE_URL = "https://hn.algolia.com/api/v1/users"
+BASE_URL = "https://hn.algolia.com/api/v1"
 filename = "hacker_news_comments.csv"
 
 
 async def get_bio(username: str, client: httpx.AsyncClient) -> str:
-    response = await client.get(f"{BASE_URL}/{username}")
+    response = await client.get(f"{BASE_URL}/users/{username}")
     data = response.json()
     return data["about"]
 
@@ -57,7 +57,7 @@ headers = {"User-Agent": "curl/7.72.0"}
 page = 0
 with httpx.Client(headers=headers, timeout=None) as client:
     while True:
-        url = f"https://hn.algolia.com/api/v1/search_by_date?tags=comment,story_{STORY_ID}&hitsPerPage={pageSize}&page={page}"
+        url = f"{BASE_URL}/search_by_date?tags=comment,story_{STORY_ID}&hitsPerPage={pageSize}&page={page}"
         response = client.get(url)
         data = response.json()
         pages = data["nbPages"]
@@ -72,11 +72,9 @@ with httpx.Client(headers=headers, timeout=None) as client:
 
 
 async def main() -> None:
-    t0 = time.time()
     usernames = df['author']
 
     print(f'Fetching {len(usernames)} bios')
-    headers = {"User-Agent": "curl/7.72.0"}
     async with httpx.AsyncClient(headers=headers, timeout=None) as client:
         tasks = [get_bio(user, client) for user in usernames]
         bios = await asyncio.gather(*tasks)
