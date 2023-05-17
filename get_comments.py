@@ -63,7 +63,6 @@ def get_comments(story_id: str) -> pd.DataFrame:
             response = client.get(url)
             json: dict = response.json()
             pages: int = json["nbPages"]
-            last: int = json["nbHits"] < page_size
             data = pd.DataFrame(json["hits"])[requested_keys]
             dataframe = pd.concat([dataframe, data], ignore_index=True)
             page += 1
@@ -87,7 +86,9 @@ def update_csv(file: io.TextIOWrapper, dataframe: pd.DataFrame) -> None:
     dataframe["bio"] = dataframe["bio"].map(
         lambda x: html2text.html2text(x).replace(",", "")
     )
-    ordered_dataframe: pd.DataFrame = dataframe[["author", "created_at", "objectID", "comment_text", "bio"]]
+    ordered_dataframe: pd.DataFrame = dataframe[
+        ["author", "created_at", "objectID", "comment_text", "bio"]
+    ]
     ordered_dataframe.to_csv(file, encoding="utf-8", index=False)
 
 
@@ -128,7 +129,9 @@ async def main() -> None:
     # verify csv file is the same length as the dataframe plus the header
     csv_num_lines = sum(1 for i in csv.reader(open('hackernews_comments.csv')))
     if csv_num_lines != (len(dataframe) + 1):
-        raise Exception("csv file is not the same length as the dataframe", len(dataframe), csv_num_lines)
+        raise Exception("csv file is not the same length as the dataframe",
+            len(dataframe),
+            csv_num_lines)
 
     print(f"Total time: {time.time() - t0:.3} seconds")
 
