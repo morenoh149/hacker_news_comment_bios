@@ -20,6 +20,7 @@ import datetime
 import io
 import time
 import os
+import urllib.parse
 
 import httpx
 import html2text
@@ -49,10 +50,15 @@ def get_comments(story_id: str) -> pd.DataFrame:
     pageSize: int = 100
     requested_keys: list = ["author", "created_at_i", "objectID", "comment_text"]
     headers: dict = {"User-Agent": "curl/7.72.0"}
+    api_comment: str = f'{BASE_URL}/search_by_date?'
     page: int = 0
+    params: dict = {
+        'tags': f'comment,story_{story_id}',
+        'hitsPerPage': pageSize,
+        'page': page}
     with httpx.Client(headers=headers, timeout=None) as client:
         while True:
-            url: str = f"{BASE_URL}/search_by_date?tags=comment,story_{story_id}&hitsPerPage={pageSize}&page={page}"
+            url: str = api_comment + urllib.parse.urlencode(params)
             print(f"Fetching page {url}")
             response = client.get(url)
             json: dict = response.json()
