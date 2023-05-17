@@ -1,2 +1,3 @@
-- name: Python flake8 Lint
-  uses: py-actions/flake8@v2.2.1
+name: Python flake8 Lint
+
+uses: py-actions/flake8@v2.2.1
