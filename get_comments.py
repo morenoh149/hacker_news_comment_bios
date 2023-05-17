@@ -4,7 +4,8 @@
 Usage:
 $ ./get_comments.py 35769529
 
-This script first finds all comments in a hackernews thread by paginating through the api one page at a time.
+This script downloads all comments in a hackernews thread
+by paginating through the api one page at a time.
 Then it fetches the bio for each user in parallel using httpx.AsyncClient.
 The comments and bios are accumulated into a pandas dataframe.
 Finally it writes the pandas dataframe to a csv file.
@@ -38,6 +39,7 @@ async def get_bio(username: str, client: httpx.AsyncClient) -> str:
     data: dict = response.json()
     return data["about"]
 
+
 def get_comments(story_id: str) -> pd.DataFrame:
     """
     get_comments paginates through a thread in increments of 100 and returns a pandas dataframe
@@ -63,6 +65,7 @@ def get_comments(story_id: str) -> pd.DataFrame:
                 break
     return df
 
+
 def update_csv(file: io.TextIOWrapper, df: pd.DataFrame) -> None:
     """
     update_csv sanitizes columns in the dataframe and writes them out to a csv file
@@ -81,6 +84,7 @@ def update_csv(file: io.TextIOWrapper, df: pd.DataFrame) -> None:
     ordered_df: pd.DataFrame = df[["author", "created_at", "objectID", "comment_text", "bio"]]
     ordered_df.to_csv(file, encoding="utf-8", index=False)
 
+
 def parse_args() -> argparse.Namespace:
     """
     parse_args parses the command line argument, story_id
@@ -90,6 +94,7 @@ def parse_args() -> argparse.Namespace:
         description='Download bios from hackernews and stores them in a csv')
     parser.add_argument('story_id', help='The thread id to download comments from.')
     return parser.parse_args()
+
 
 async def main() -> None:
     t0 = time.time()
@@ -129,6 +134,7 @@ TODO
 [*] move the search_by_date thing into a separate function;
 [ ] make it get_comments async;
 [*] automate the verification of the csv
-[*] converting the "this is documentation" comment into a docstring that you can access with myscript --help is a nice touch too
-[ ] finish out typing and put it in a repo with a CI pipeline checking the typing and running linters (say flake8) on it
+[*] docstring that you can access with myscript --help is a nice touch too
+[*] put it in a repo with a CI pipeline checking running linters (say flake8)
+[ ] ci that checks typing (mypy)
 """

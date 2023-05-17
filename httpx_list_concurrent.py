@@ -1,7 +1,3 @@
-"""
-proof of concept, get all bios in parallel using asyncio
-"""
-
 import asyncio
 import time
 
@@ -10,6 +6,9 @@ import httpx
 
 BASE_URL = "https://hn.algolia.com/api/v1/users"
 
+"""
+proof of concept, get all bios in parallel using asyncio
+"""
 
 async def get_bio(username: str, client: httpx.AsyncClient) -> str:
     response = await client.get(f"{BASE_URL}/{username}")
