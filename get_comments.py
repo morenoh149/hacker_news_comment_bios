@@ -10,6 +10,15 @@ Then it fetches the bio for each user in parallel using httpx.AsyncClient.
 The comments and bios are accumulated into a pandas dataframe.
 Finally it writes the pandas dataframe to a csv file.
 
+TODO
+[*] add type annotations to update_csv;
+[*] move the search_by_date thing into a separate function;
+[ ] make it get_comments async;
+[*] automate the verification of the csv
+[*] docstring that you can access with myscript --help is a nice touch too
+[*] put it in a repo with a CI pipeline checking running linters (say flake8)
+[ ] ci that checks typing (mypy)
+
 This project is licensed under the terms of the MIT license.
 """
 
@@ -130,7 +139,7 @@ async def main() -> None:
         update_csv(file, dataframe)
 
     # verify csv file is the same length as the dataframe plus the header
-    csv_num_lines = sum(1 for i in csv.reader(open('hackernews_comments.csv')))
+    csv_num_lines = sum(1 for i in csv.reader(open('hackernews_comments.csv', encoding="utf-8")))
     if csv_num_lines != (len(dataframe) + 1):
         raise Exception("csv file is not the same length as the dataframe",
             len(dataframe),
@@ -139,14 +148,3 @@ async def main() -> None:
     print(f"Total time: {time.time() - t_0:.3} seconds")
 
 asyncio.run(main())
-
-"""
-TODO
-[*] add type annotations to update_csv;
-[*] move the search_by_date thing into a separate function;
-[ ] make it get_comments async;
-[*] automate the verification of the csv
-[*] docstring that you can access with myscript --help is a nice touch too
-[*] put it in a repo with a CI pipeline checking running linters (say flake8)
-[ ] ci that checks typing (mypy)
-"""

@@ -1,3 +1,7 @@
+"""
+proof of concept, get all bios in parallel using asyncio
+"""
+
 import asyncio
 import time
 
@@ -6,12 +10,10 @@ import httpx
 
 BASE_URL = "https://hn.algolia.com/api/v1/users"
 
-"""
-proof of concept, get all bios in parallel using asyncio
-"""
-
-
 async def get_bio(username: str, client: httpx.AsyncClient) -> str:
+    """
+    get_bio async wrapper allowing bios to be fetched in parallel.
+    """
     response = await client.get(f"{BASE_URL}/{username}")
     print(".")
     data = response.json()
@@ -19,7 +21,10 @@ async def get_bio(username: str, client: httpx.AsyncClient) -> str:
 
 
 async def main() -> None:
-    t0 = time.time()
+    """
+    main async function
+    """
+    t_0 = time.time()
     usernames = [
         "author",
         "abtinf",
@@ -65,6 +70,6 @@ async def main() -> None:
         tasks = [get_bio(user, client) for user in usernames]
         bios = await asyncio.gather(*tasks)
     print(dict(zip(usernames, bios)))
-    print(f"Total time: {time.time() - t0:.3} seconds")
+    print(f"Total time: {time.time() - t_0:.3} seconds")
 
 asyncio.run(main())
