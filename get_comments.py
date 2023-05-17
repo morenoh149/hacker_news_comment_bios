@@ -46,15 +46,15 @@ def get_comments(story_id: str) -> pd.DataFrame:
     get_comments paginates through a thread in increments of 100 and returns a pandas dataframe
     TODO: after the first request, if there are many pages, load them in parallel.
     """
-    df: pd.DataFrame = pd.DataFrame()
-    pageSize: int = 100
+    dataframe: pd.DataFrame = pd.DataFrame()
+    page_size: int = 100
     requested_keys: list = ["author", "created_at_i", "objectID", "comment_text"]
     headers: dict = {"User-Agent": "curl/7.72.0"}
     api_comment: str = f'{BASE_URL}/search_by_date?'
     page: int = 0
     params: dict = {
         'tags': f'comment,story_{story_id}',
-        'hitsPerPage': pageSize,
+        'hitsPerPage': page_size,
         'page': page}
     with httpx.Client(headers=headers, timeout=None) as client:
         while True:
@@ -63,32 +63,32 @@ def get_comments(story_id: str) -> pd.DataFrame:
             response = client.get(url)
             json: dict = response.json()
             pages: int = json["nbPages"]
-            last: int = json["nbHits"] < pageSize
+            last: int = json["nbHits"] < page_size
             data = pd.DataFrame(json["hits"])[requested_keys]
-            df = pd.concat([df, data], ignore_index=True)
+            dataframe = pd.concat([dataframe, data], ignore_index=True)
             page += 1
             if page >= pages:
                 break
-    return df
+    return dataframe
 
 
-def update_csv(file: io.TextIOWrapper, df: pd.DataFrame) -> None:
+def update_csv(file: io.TextIOWrapper, dataframe: pd.DataFrame) -> None:
     """
     update_csv sanitizes columns in the dataframe and writes them out to a csv file
     """
-    df["comment_text"] = df["comment_text"].map(
+    dataframe["comment_text"] = dataframe["comment_text"].map(
         lambda x: html2text.html2text(x).replace(",", "")
     )
-    df["created_at"] = df["created_at_i"].map(
+    dataframe["created_at"] = dataframe["created_at_i"].map(
         lambda x: datetime.datetime.fromtimestamp(
             int(x), tz=datetime.timezone(datetime.timedelta(hours=-5))
         ).strftime("%Y-%m-%d %H:%M:%S")
     )
-    df["bio"] = df["bio"].map(
+    dataframe["bio"] = dataframe["bio"].map(
         lambda x: html2text.html2text(x).replace(",", "")
     )
-    ordered_df: pd.DataFrame = df[["author", "created_at", "objectID", "comment_text", "bio"]]
-    ordered_df.to_csv(file, encoding="utf-8", index=False)
+    ordered_dataframe: pd.DataFrame = dataframe[["author", "created_at", "objectID", "comment_text", "bio"]]
+    ordered_dataframe.to_csv(file, encoding="utf-8", index=False)
 
 
 def parse_args() -> argparse.Namespace:
@@ -111,8 +111,8 @@ async def main() -> None:
     if os.path.isfile(filename):
         os.remove(filename)
 
-    df: pd.DataFrame = get_comments(args.story_id)
-    usernames: pd.Series = df['author']
+    dataframe: pd.DataFrame = get_comments(args.story_id)
+    usernames: pd.Series = dataframe['author']
 
     print(f'Fetching {len(usernames)} bios')
     headers: dict = {"User-Agent": "curl/7.72.0"}
@@ -120,15 +120,15 @@ async def main() -> None:
         tasks: list = [get_bio(user, client) for user in usernames]
         bios = await asyncio.gather(*tasks)
 
-    df['bio'] = bios
+    dataframe['bio'] = bios
 
     with open(filename, "a") as file:
-        update_csv(file, df)
+        update_csv(file, dataframe)
 
     # verify csv file is the same length as the dataframe plus the header
     csv_num_lines = sum(1 for i in csv.reader(open('hackernews_comments.csv')))
-    if csv_num_lines != (len(df) + 1):
-        raise Exception("csv file is not the same length as the dataframe", len(df), csv_num_lines)
+    if csv_num_lines != (len(dataframe) + 1):
+        raise Exception("csv file is not the same length as the dataframe", len(dataframe), csv_num_lines)
 
     print(f"Total time: {time.time() - t0:.3} seconds")
 
