@@ -104,7 +104,10 @@ def parse_args() -> argparse.Namespace:
 
 
 async def main() -> None:
-    t0 = time.time()
+    """
+    main is the entry point for the script, we time this script.
+    """
+    t_0 = time.time()
 
     args: argparse.Namespace = parse_args()
 
@@ -123,7 +126,7 @@ async def main() -> None:
 
     dataframe['bio'] = bios
 
-    with open(filename, "a") as file:
+    with open(filename, "a", encoding='utf-8') as file:
         update_csv(file, dataframe)
 
     # verify csv file is the same length as the dataframe plus the header
@@ -133,7 +136,7 @@ async def main() -> None:
             len(dataframe),
             csv_num_lines)
 
-    print(f"Total time: {time.time() - t0:.3} seconds")
+    print(f"Total time: {time.time() - t_0:.3} seconds")
 
 asyncio.run(main())
 
