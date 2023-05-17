@@ -52,12 +52,19 @@ async def get_bio(username: str, client: httpx.AsyncClient) -> str:
 
 def get_comments(story_id: str) -> pd.DataFrame:
     """
-    get_comments paginates through a thread in increments of 100 and returns a pandas dataframe
-    TODO: after the first request, if there are many pages, load them in parallel.
+    get_comments paginates through a thread in increments of 100
+    returns a pandas dataframe
+
+    TODO: after the first request, if there are many pages, load them in
+    parallel.
     """
     dataframe: pd.DataFrame = pd.DataFrame()
     page_size: int = 100
-    requested_keys: list = ["author", "created_at_i", "objectID", "comment_text"]
+    requested_keys: list = [
+        "author",
+        "created_at_i",
+        "objectID",
+        "comment_text"]
     headers: dict = {"User-Agent": "curl/7.72.0"}
     api_comment: str = f'{BASE_URL}/search_by_date?'
     page: int = 0
