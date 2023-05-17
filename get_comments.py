@@ -52,12 +52,12 @@ def get_comments(story_id: str) -> pd.DataFrame:
     headers: dict = {"User-Agent": "curl/7.72.0"}
     api_comment: str = f'{BASE_URL}/search_by_date?'
     page: int = 0
-    params: dict = {
-        'tags': f'comment,story_{story_id}',
-        'hitsPerPage': page_size,
-        'page': page}
     with httpx.Client(headers=headers, timeout=None) as client:
         while True:
+            params: dict = {
+                'tags': f'comment,story_{story_id}',
+                'hitsPerPage': page_size,
+                'page': page}
             url: str = api_comment + urllib.parse.urlencode(params)
             print(f"Fetching page {url}")
             response = client.get(url)
