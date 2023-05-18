@@ -17,9 +17,9 @@ email in the about section.
 
 Written for python 3.11 and pipenv.
 
-1. `pipenv install`
+1. `$ pipenv install`
 1. Find the thread id. it is the last number in the url `https://news.ycombinator.com/item?id=35759449`
-1. run `python get_comments.py 35759449`
+1. run `$ python get_comments.py 35759449`
 
 You'll have a `hackernews_comments.csv` file created locally.
 
