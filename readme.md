@@ -25,7 +25,7 @@ You'll have a `hackernews_comments.csv` file created locally.
 
 ## Tests
 
-1. `$ python tests.py`
+* `$ python test.py`
 ## Other resources
 
 1. Inspired by https://github.com/jaredsohn/hacker-news-download-all-comments
