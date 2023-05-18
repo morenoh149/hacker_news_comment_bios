@@ -146,11 +146,12 @@ async def main() -> None:
         update_csv(file, dataframe)
 
     # verify csv file is the same length as the dataframe plus the header
-    csv_num_lines = sum(1 for i in csv.reader(open('hackernews_comments.csv', encoding="utf-8")))
-    if csv_num_lines != (len(dataframe) + 1):
-        raise Exception("csv file is not the same length as the dataframe",
-            len(dataframe),
-            csv_num_lines)
+    with open('hackernews_comments.csv', encoding="utf-8") as file:
+        csv_num_lines = sum(1 for i in csv.reader(file))
+        if csv_num_lines != (len(dataframe) + 1):
+            raise Exception("csv file is not the same length as the dataframe",
+                len(dataframe),
+                csv_num_lines)
 
     print(f"Total time: {time.time() - t_0:.3} seconds")
 
