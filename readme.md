@@ -1,7 +1,7 @@
 # Hacker News Comment Bios
 
 ![pylint](https://github.com/morenoh149/hacker_news_comment_bios/actions/workflows/pylint.yml/badge.svg)
-[![flake8 Lint](https://github.com/morenoh149/hacker_news_comment_bios/actions/workflows/flake8.yml/badge.svg)](https://github.com/morenoh149/hacker_news_comment_bios/actions/workflows/flake8.yml)
+[![flake8](https://github.com/morenoh149/hacker_news_comment_bios/actions/workflows/flake8.yml/badge.svg)](https://github.com/morenoh149/hacker_news_comment_bios/actions/workflows/flake8.yml)
 
 
 This is a tool for getting leads from [HackerNews](https://news.ycombinator.com/) threads.
