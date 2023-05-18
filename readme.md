@@ -23,6 +23,9 @@ Written for python 3.11 and pipenv.
 
 You'll have a `hackernews_comments.csv` file created locally.
 
+## Tests
+
+1. `$ python tests.py`
 ## Other resources
 
 1. Inspired by https://github.com/jaredsohn/hacker-news-download-all-comments
