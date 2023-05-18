@@ -1,5 +1,8 @@
 # Hacker News Comment Bios
 
+![pylint](https://github.com/github/docs/actions/workflows/pylint.yml/badge.svg)
+
+
 This is a tool for getting leads from [HackerNews](https://news.ycombinator.com/) threads.
 Often you want to reach
 out to people that have participated in a conversation. With this tool you get
