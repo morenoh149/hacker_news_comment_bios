@@ -1,4 +1,4 @@
-name: flake8 Lint
+name: flake8
 
 on: [push, pull_request]
 
@@ -13,5 +13,5 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - name: flake8 Lint
+      - name: Flake8
         uses: py-actions/flake8@v2
