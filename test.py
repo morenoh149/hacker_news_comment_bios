@@ -1,3 +1,6 @@
+"""
+Test module for get_comments.py
+"""
 import unittest
 
 
