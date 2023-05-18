@@ -15,7 +15,7 @@ TODO
 [*] move the search_by_date thing into a separate function;
 [ ] make it get_comments async;
 [*] automate the verification of the csv
-[*] docstring that you can access with ./get_comments.py --help is a nice touch too
+[*] docstring that you can access with ./get_comments.py --help
 [*] put it in a repo with a CI pipeline checking running linters (say flake8)
 [ ] ci that checks typing (mypy)
 
@@ -89,7 +89,7 @@ def get_comments(story_id: str) -> pd.DataFrame:
 
 def update_csv(file: io.TextIOWrapper, dataframe: pd.DataFrame) -> None:
     """
-    update_csv sanitizes columns in the dataframe and writes them out to a csv file
+    update_csv sanitizes columns in the dataframe and writes to a csv file
     """
     dataframe["comment_text"] = dataframe["comment_text"].map(
         lambda x: html2text.html2text(x).replace(",", "")
@@ -118,8 +118,8 @@ def parse_args() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(
         prog="Download HackerNews comments",
-        description='Download bios from hackernews and stores them in a csv')
-    parser.add_argument('story_id', help='The thread id to download comments from.')
+        description='Download bios from hackernews and store them in a csv')
+    parser.add_argument('story_id', help='The thread id to download comments.')
     return parser.parse_args()
 
 
@@ -153,9 +153,9 @@ async def main() -> None:
     with open('hackernews_comments.csv', encoding="utf-8") as file:
         csv_num_lines = sum(1 for i in csv.reader(file))
         if csv_num_lines != (len(dataframe) + 1):
-            raise InvalidCSVException("csv file is not the same length as the dataframe",
-                len(dataframe),
-                csv_num_lines)
+            raise InvalidCSVException("csv file is not the correct length",
+                                      len(dataframe),
+                                      csv_num_lines)
 
     print(f"Total time: {time.time() - t_0:.3} seconds")
 

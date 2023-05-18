@@ -10,6 +10,7 @@ import httpx
 
 BASE_URL = "https://hn.algolia.com/api/v1/users"
 
+
 async def get_bio(username: str, client: httpx.AsyncClient) -> str:
     """
     get_bio async wrapper allowing bios to be fetched in parallel.
