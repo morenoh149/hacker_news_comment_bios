@@ -1,6 +1,6 @@
 # Hacker News Comment Bios
 
-![pylint](https://github.com/github/docs/actions/workflows/pylint.yml/badge.svg)
+![pylint](https://github.com/morenoh149/hacker_news_comment_bios/actions/workflows/pylint.yml/badge.svg)
 
 
 This is a tool for getting leads from [HackerNews](https://news.ycombinator.com/) threads.
