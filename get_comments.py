@@ -15,7 +15,7 @@ TODO
 [*] move the search_by_date thing into a separate function;
 [ ] make it get_comments async;
 [*] automate the verification of the csv
-[*] docstring that you can access with myscript --help is a nice touch too
+[*] docstring that you can access with ./get_comments.py --help is a nice touch too
 [*] put it in a repo with a CI pipeline checking running linters (say flake8)
 [ ] ci that checks typing (mypy)
 
@@ -108,6 +108,10 @@ def update_csv(file: io.TextIOWrapper, dataframe: pd.DataFrame) -> None:
     ordered_dataframe.to_csv(file, encoding="utf-8", index=False)
 
 
+class InvalidCSVException(Exception):
+    "Raised when the csv length does not match the number of bios"
+
+
 def parse_args() -> argparse.Namespace:
     """
     parse_args parses the command line argument, story_id
@@ -149,7 +153,7 @@ async def main() -> None:
     with open('hackernews_comments.csv', encoding="utf-8") as file:
         csv_num_lines = sum(1 for i in csv.reader(file))
         if csv_num_lines != (len(dataframe) + 1):
-            raise Exception("csv file is not the same length as the dataframe",
+            raise InvalidCSVException("csv file is not the same length as the dataframe",
                 len(dataframe),
                 csv_num_lines)
 
