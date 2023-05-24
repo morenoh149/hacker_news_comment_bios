@@ -33,3 +33,8 @@ You'll have a `hackernews_comments.csv` file created locally.
 1. official hn api https://github.com/HackerNews/API#users
 1. https://github.com/minimaxir/get-all-hacker-news-submissions-comments
 1. https://github.com/itielshwartz/asyncio-hn
+
+## Hire Me
+
+If you have a good company, I would love to help you. You can email me at my
+username at gmail.
