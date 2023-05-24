@@ -13,10 +13,10 @@ Finally it writes the pandas dataframe to a csv file.
 TODO
 [*] add type annotations to update_csv;
 [*] move the search_by_date thing into a separate function;
-[ ] make it get_comments async;
 [*] automate the verification of the csv
 [*] docstring that you can access with ./get_comments.py --help
 [*] put it in a repo with a CI pipeline checking running linters (say flake8)
+[ ] make get_comments async
 [ ] ci that checks typing (mypy)
 
 This project is licensed under the terms of the MIT license.
