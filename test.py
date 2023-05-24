@@ -7,7 +7,7 @@ import unittest
 
 import httpx
 
-from get_comments import parser, get_bio, main
+from get_comments import parser, get_bio
 
 
 class TestGetComments(unittest.TestCase):
@@ -30,9 +30,9 @@ class TestGetComments(unittest.TestCase):
         """Test that the tool complains about invalid story_id"""
         cmd_args = "abc ".split()
         try:
-            args = parser().parse_args(cmd_args)
+            parser().parse_args(cmd_args)
             return True
-        except SystemExit as e:
+        except SystemExit:
             return False
 
 
