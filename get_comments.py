@@ -119,7 +119,8 @@ def parser() -> argparse.ArgumentParser:
     my_parser = argparse.ArgumentParser(
         prog="Download HackerNews comments",
         description='Download bios from hackernews and store them in a csv')
-    my_parser.add_argument('story_id', help='The thread id to download comments.')
+    my_parser.add_argument('story_id',
+                           help='The thread id to download comments for.')
     return my_parser
 
 
