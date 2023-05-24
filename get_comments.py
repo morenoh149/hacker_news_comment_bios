@@ -112,7 +112,7 @@ class InvalidCSVException(Exception):
     "Raised when the csv length does not match the number of bios"
 
 
-def parse_args() -> argparse.Namespace:
+def parser() -> argparse.ArgumentParser:
     """
     parse_args parses the command line argument, story_id
     """
@@ -120,22 +120,20 @@ def parse_args() -> argparse.Namespace:
         prog="Download HackerNews comments",
         description='Download bios from hackernews and store them in a csv')
     parser.add_argument('story_id', help='The thread id to download comments.')
-    return parser.parse_args()
+    return parser
 
 
-async def main() -> None:
+async def main(my_args: argparse.Namespace) -> None:
     """
     main is the entry point for the script, we time this script.
     """
     t_0 = time.time()
 
-    args: argparse.Namespace = parse_args()
-
     filename: str = "hackernews_comments.csv"
     if os.path.isfile(filename):
         os.remove(filename)
 
-    dataframe: pd.DataFrame = get_comments(args.story_id)
+    dataframe: pd.DataFrame = get_comments(my_args.story_id)
     usernames: pd.Series = dataframe['author']
 
     print(f'Fetching {len(usernames)} bios')
@@ -159,4 +157,6 @@ async def main() -> None:
 
     print(f"Total time: {time.time() - t_0:.3} seconds")
 
-asyncio.run(main())
+if __name__ == "__main__":
+    args = parser().parse_args()
+    asyncio.run(main(args))
