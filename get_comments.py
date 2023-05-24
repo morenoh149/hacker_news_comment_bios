@@ -116,11 +116,11 @@ def parser() -> argparse.ArgumentParser:
     """
     parse_args parses the command line argument, story_id
     """
-    parser = argparse.ArgumentParser(
+    my_parser = argparse.ArgumentParser(
         prog="Download HackerNews comments",
         description='Download bios from hackernews and store them in a csv')
-    parser.add_argument('story_id', help='The thread id to download comments.')
-    return parser
+    my_parser.add_argument('story_id', help='The thread id to download comments.')
+    return my_parser
 
 
 async def main(my_args: argparse.Namespace) -> None:

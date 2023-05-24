@@ -7,7 +7,7 @@ import unittest
 
 import httpx
 
-from get_comments import parser, get_bio
+from get_comments import parser, get_bio   # pylint: disable=import-error
 
 
 class TestGetComments(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestGetComments(unittest.TestCase):
         """Test that the tool accepts valid story_id"""
         cmd_args = "35759449 ".split()
         args = parser().parse_args(cmd_args)
-        assert type(args) == argparse.Namespace
+        assert isinstance(args, argparse.Namespace)
 
     def test_invalid_args(self):
         """Test that the tool complains about invalid story_id"""
