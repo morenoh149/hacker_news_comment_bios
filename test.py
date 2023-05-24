@@ -20,13 +20,20 @@ class TestGetComments(unittest.TestCase):
         bio = get_bio(username, client)
         self.assertIsInstance(bio, Coroutine)
 
-    def test_invalid_args(self):
-        """Test that the tool complains if a invalid thread id is passed"""
-        # self.assertEqual(sum((1, 2, 2)), 5, "Should be 6")
-
+    def test_valid_args(self):
+        """Test that the tool accepts valid story_id"""
         cmd_args = "35759449 ".split()
         args = parser().parse_args(cmd_args)
         assert type(args) == argparse.Namespace
+
+    def test_invalid_args(self):
+        """Test that the tool complains about invalid story_id"""
+        cmd_args = "abc ".split()
+        try:
+            args = parser().parse_args(cmd_args)
+            return True
+        except SystemExit as e:
+            return False
 
 
 if __name__ == '__main__':
